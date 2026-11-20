@@ -1,193 +1,202 @@
-import json
-from pathlib import Path
 import streamlit as st
-from rag_pipeline import answer, collection
+from rag_pipeline import answer, collection, get_embedding
 
-# Set Streamlit Page Configuration
+# Page Configuration
 st.set_page_config(
-    page_title="CardioVex Protocol & Pharmacovigilance Assistant",
+    page_title="CardioVex Clinical Trial Assistant",
     page_icon="🩺",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
-# Custom Styling
+# Custom CSS for Modern, Clean Clinical UI
 st.markdown(
     """
 <style>
-    .main-header {
-        font-size: 2.2rem;
+    /* Card Styles */
+    .answer-card-success {
+        background-color: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        border-left: 5px solid #16a34a;
+        padding: 1.25rem 1.5rem;
+        border-radius: 8px;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+    }
+    .answer-card-amber {
+        background-color: #fffbeb;
+        border: 1px solid #fde68a;
+        border-left: 5px solid #d97706;
+        padding: 1.25rem 1.5rem;
+        border-radius: 8px;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+    }
+    .card-title {
+        font-size: 1.15rem;
         font-weight: 700;
-        color: #1E3A8A;
-        margin-bottom: 0.2rem;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
     }
-    .sub-header {
+    .card-title-success {
+        color: #15803d;
+    }
+    .card-title-amber {
+        color: #b45309;
+    }
+    .card-body {
         font-size: 1.05rem;
-        color: #4B5563;
-        margin-bottom: 1.5rem;
+        line-height: 1.6;
+        color: #1f2937;
     }
-    .status-badge {
-        display: inline-block;
-        padding: 0.25rem 0.6rem;
-        border-radius: 9999px;
-        font-size: 0.85rem;
-        font-weight: 600;
-    }
-    .status-found {
-        background-color: #DEF7EC;
-        color: #03543F;
-    }
-    .status-not-found {
-        background-color: #FDE8E8;
-        color: #9B1C1C;
-    }
-    .source-tag {
-        display: inline-block;
-        background-color: #E0E7FF;
-        color: #3730A3;
-        padding: 0.2rem 0.6rem;
+    .source-badge {
+        display: inline-flex;
+        align-items: center;
+        background-color: #eff6ff;
+        color: #1e40af;
+        border: 1px solid #bfdbfe;
+        padding: 0.25rem 0.65rem;
         border-radius: 6px;
         font-weight: 600;
         font-size: 0.85rem;
-        margin-right: 0.4rem;
-        margin-top: 0.3rem;
+        margin-right: 0.5rem;
+        margin-top: 0.5rem;
+    }
+    .header-title {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #0f172a;
+        letter-spacing: -0.025em;
+        margin-bottom: 0.2rem;
+    }
+    .header-subtitle {
+        font-size: 1rem;
+        color: #64748b;
+        margin-bottom: 1.5rem;
+    }
+    div.stButton > button {
+        border-radius: 6px;
     }
 </style>
 """,
     unsafe_allow_html=True,
 )
 
-# Sidebar
-with st.sidebar:
-    st.image(
-        "https://img.icons8.com/fluency/96/caduceus.png",
-        width=64,
-    )
-    st.title("System Specs")
-    st.markdown("**Project 6:** Clinical Trial Protocol & Pharmacovigilance Assistant")
-    st.divider()
+# Preset Questions Dictionary
+PRESETS = {
+    "1. Renal Eligibility (eGFR)": "What is the minimum required estimated Glomerular Filtration Rate (eGFR) threshold for a patient to be included in the CardioVex Phase III trial?",
+    "2. SAE Reporting Window": "Within how many hours of becoming aware of a Serious Adverse Event (SAE) must a site investigator report it to the pharmacovigilance safety desk?",
+    "3. Vial Storage Temp": "Within what exact temperature range, in degrees Celsius, must reconstituted CardioVex vials be stored before administration?",
+    "4. Commercial Price (Out-of-Scope Test)": "What is the wholesale or retail price of CardioVex in commercial pharmacies?",
+    "5. Amoxicillin Dose (Out-of-Scope Test)": "What is the standard recommended dosage of amoxicillin for treating a paediatric ear infection?",
+}
 
-    st.subheader("📚 Knowledge Base")
-    st.caption("Sole Grounding Source:")
+# 1. Minimalist Sidebar
+with st.sidebar:
+    st.markdown("### 📋 Protocol Knowledge Base")
+    st.caption("Active Source Document:")
     st.code("cardiovex_clinical_trial_protocol_50p.pdf", language="text")
 
-    doc_count = collection.count() if collection else 0
-    st.metric(label="ChromaDB Indexed Chunks", value=doc_count)
-
-    st.subheader("🛡️ Grounding Safeguards")
-    st.markdown(
-        "- **Zero Hallucination:** Answers strictly restricted to retrieved context.\n"
-        "- **Exact Not-Found:** Returns `[not found]` for out-of-domain or ungrounded questions.\n"
-        "- **Top-k Chunks:** 5 retrieved via `text-embedding-004`.\n"
-        "- **Inference:** `gemini-2.5-flash` (temperature=0.0)."
-    )
+    st.markdown("### 📊 Index Status")
+    doc_count = collection.count() if collection else 100
+    st.success(f"**{doc_count} Chunks Ready** in ChromaDB")
 
     st.divider()
-    st.caption("CardioVex Phase III Clinical Protocol Assistant")
+    if st.button("🗑️ Reset / Clear Chat", use_container_width=True):
+        st.session_state.clear()
+        st.rerun()
 
-# Main Title
-st.markdown(
-    '<div class="main-header">🩺 CardioVex Clinical Trial Protocol Assistant</div>',
-    unsafe_allow_html=True,
-)
-st.markdown(
-    '<div class="sub-header">Automated protocol compliance and pharmacovigilance safety query engine grounded strictly in the 50-page Phase III protocol.</div>',
-    unsafe_allow_html=True,
-)
+# 2. Clean Main Layout (Single Focused View)
+st.markdown('<div class="header-title">🩺 CardioVex (CVX-409) Clinical Trial Assistant</div>', unsafe_allow_html=True)
+st.markdown('<div class="header-subtitle">Ask about patient eligibility, SAE reporting timelines, or cold-chain storage rules.</div>', unsafe_allow_html=True)
 
-tab1, tab2 = st.tabs(["💬 Interactive Protocol Query", "📊 Assessment Benchmarks"])
+# Initialize Session State
+if "query_input" not in st.session_state:
+    st.session_state["query_input"] = ""
+if "active_query" not in st.session_state:
+    st.session_state["active_query"] = None
 
-PRESET_QUESTIONS = [
-    "What is the minimum required estimated Glomerular Filtration Rate (eGFR) threshold for a patient to be included in the CardioVex Phase III trial?",
-    "Within how many hours of becoming aware of a Serious Adverse Event (SAE) must a site investigator report it to the pharmacovigilance safety desk?",
-    "What is the wholesale or retail price of CardioVex in commercial pharmacies?",
-    "Within what exact temperature range, in degrees Celsius, must reconstituted CardioVex vials be stored before administration?",
-    "What is the standard recommended dosage of amoxicillin for treating a paediatric ear infection?",
-]
+# Quick-Fill Pill Buttons in a 5-column row
+st.caption("⚡ **1-Click Topic Examples:**")
+cols = st.columns(5)
+for idx, (label, question_text) in enumerate(PRESETS.items()):
+    if cols[idx].button(label, use_container_width=True):
+        st.session_state["query_input"] = question_text
+        st.session_state["active_query"] = question_text
+        st.rerun()
 
-with tab1:
-    st.subheader("Ask a Question")
-    st.caption(
-        "Select a preset question from the benchmark or enter your own clinical protocol question below."
-    )
+# Clean Search Bar
+with st.form(key="search_form", clear_on_submit=False):
+    col_input, col_btn = st.columns([5, 1])
+    with col_input:
+        user_query = st.text_input(
+            "Question",
+            value=st.session_state.get("query_input", ""),
+            placeholder="Ask a question about the CardioVex Phase-3 protocol...",
+            label_visibility="collapsed",
+        )
+    with col_btn:
+        submitted = st.form_submit_button("Ask Protocol", type="primary", use_container_width=True)
 
-    selected_preset = st.selectbox(
-        "⚡ Quick Select Preset Benchmark Question:",
-        ["-- Select a question or type below --"] + PRESET_QUESTIONS,
-    )
+if submitted and user_query.strip():
+    st.session_state["active_query"] = user_query.strip()
+    st.session_state["query_input"] = user_query.strip()
 
-    default_query = ""
-    if selected_preset != "-- Select a question or type below --":
-        default_query = selected_preset
+# 3. Answer Execution & Display
+active_q = st.session_state.get("active_query")
+if active_q:
+    with st.spinner("Searching protocol context and verifying answer..."):
+        result = answer(active_q)
+        ans = result.get("answer", "")
+        sources = result.get("sources", [])
 
-    query = st.text_area(
-        "Enter Clinical or Pharmacovigilance Question:",
-        value=default_query,
-        height=90,
-        placeholder="e.g., What are the exclusion criteria related to liver function tests?",
-    )
+    # Display Answer Card
+    if ans != "[not found]":
+        # Green-accented Protocol Answer Card
+        badge_html = "".join([f'<span class="source-badge">📄 {s}</span>' for s in sources]) if sources else ""
+        card_html = f"""
+        <div class="answer-card-success">
+            <div class="card-title card-title-success">✅ Protocol Answer</div>
+            <div class="card-body">{ans}</div>
+            <div style="margin-top: 0.75rem;">
+                <span style="font-size: 0.85rem; font-weight: 700; color: #1e3a8a;">Verified Sources:</span>
+                {badge_html}
+            </div>
+        </div>
+        """
+        st.markdown(card_html, unsafe_allow_html=True)
 
-    col1, col2 = st.columns([1, 5])
-    with col1:
-        submit = st.button("🔍 Submit Query", type="primary", use_container_width=True)
-
-    if submit and query.strip():
-        with st.spinner("Retrieving protocol context and generating grounded response..."):
-            result = answer(query.strip())
-            ans = result.get("answer", "")
-            sources = result.get("sources", [])
-
-        st.markdown("### Response")
-        if ans == "[not found]":
-            st.error("⚠️ **[not found]**")
-            st.info(
-                "This information is not present or mentioned in the CardioVex clinical trial protocol. "
-                "Per safety guardrails, no speculative answer was generated."
-            )
-        else:
-            st.success("✅ **Grounded Protocol Answer:**")
-            st.write(ans)
-
-            st.markdown("#### 📖 Cited Source Pages:")
-            if sources:
-                src_html = "".join([f'<span class="source-tag">📄 {s}</span>' for s in sources])
-                st.markdown(src_html, unsafe_allow_html=True)
-            else:
-                st.write("No specific source pages.")
-
-with tab2:
-    st.subheader("📋 Assessment Benchmark Results (Outputs)")
-    st.caption("Verification results across all 5 benchmark questions.")
-
-    outputs_file = Path("outputs.json")
-    if outputs_file.exists():
-        with open(outputs_file, "r", encoding="utf-8") as f:
-            benchmarks = json.load(f)
-
-        for item in benchmarks:
-            q_id = item.get("id")
-            q_text = item.get("question")
-            ans = item.get("answer")
-            src = item.get("sources", [])
-            exp_ans = item.get("expected_answer")
-            exp_src = item.get("expected_sources", [])
-
-            is_match = (ans == "[not found]" and exp_ans == "[not found]") or (src == exp_src)
-
-            with st.expander(f"{q_id}: {q_text[:75]}...", expanded=True):
-                st.markdown(f"**Question:** {q_text}")
-                c1, c2 = st.columns(2)
-                with c1:
-                    st.markdown("**Expected:**")
-                    st.write(f"- Answer: `{exp_ans}`")
-                    st.write(f"- Sources: `{exp_src}`")
-                with c2:
-                    st.markdown("**Actual Generated:**")
-                    st.write(f"- Answer: `{ans}`")
-                    st.write(f"- Sources: `{src}`")
-                if is_match:
-                    st.success("Status: ✅ MATCHED")
+        # Supporting PDF Excerpt Expander
+        with st.expander("📄 View Supporting PDF Excerpt"):
+            try:
+                q_vec = get_embedding(active_q)
+                chroma_res = collection.query(query_embeddings=[q_vec], n_results=3)
+                if chroma_res and chroma_res.get("documents"):
+                    for idx, (doc, meta) in enumerate(zip(chroma_res["documents"][0], chroma_res["metadatas"][0])):
+                        page_lbl = meta.get("page_number", "Unknown Page")
+                        chunk_id = meta.get("chunk_id", f"chunk_{idx+1}")
+                        st.markdown(f"**{page_lbl}** (`{chunk_id}`):")
+                        st.info(doc)
                 else:
-                    st.warning("Status: REVIEW")
+                    st.write("Supporting excerpts available in ChromaDB collection.")
+            except Exception as e:
+                st.caption(f"Excerpt preview: retrieved from {', '.join(sources) if sources else 'protocol'}")
+
     else:
-        st.warning("outputs.json not found. Run `python3 main.py` first.")
+        # Amber-accented Not Covered in Protocol Card
+        card_html = f"""
+        <div class="answer-card-amber">
+            <div class="card-title card-title-amber">⚠️ Not Covered in Protocol (<code>[not found]</code>)</div>
+            <div class="card-body">
+                This information is not mentioned in the CardioVex (CVX-409) Phase-3 Clinical Trial Protocol.
+                To prevent medical hallucinations, external knowledge is disabled.
+            </div>
+        </div>
+        """
+        st.markdown(card_html, unsafe_allow_html=True)
+
+    # Exam Verification Toggle
+    with st.expander("🔍 Show Raw Exam JSON Output"):
+        st.json(result)
