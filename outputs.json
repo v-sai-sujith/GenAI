@@ -1,0 +1,54 @@
+[
+  {
+    "id": "Q1",
+    "question": "What is the minimum required estimated Glomerular Filtration Rate (eGFR) threshold for a patient to be included in the CardioVex Phase III trial?",
+    "answer": "The minimum required baseline estimated Glomerular Filtration Rate (eGFR) is at least 45 mL/min/1.73m2 (calculated using the CKD-EPI creatinine equation).",
+    "sources": [
+      "Page 14"
+    ],
+    "expected_answer": "at least 45 mL/min/1.73m2",
+    "expected_sources": [
+      "Page 14"
+    ]
+  },
+  {
+    "id": "Q2",
+    "question": "Within how many hours of becoming aware of a Serious Adverse Event (SAE) must a site investigator report it to the pharmacovigilance safety desk?",
+    "answer": "Within 24 hours of initial site awareness.",
+    "sources": [
+      "Page 28"
+    ],
+    "expected_answer": "within 24 hours",
+    "expected_sources": [
+      "Page 28"
+    ]
+  },
+  {
+    "id": "Q3",
+    "question": "What is the wholesale or retail price of CardioVex in commercial pharmacies?",
+    "answer": "[not found]",
+    "sources": [],
+    "expected_answer": "[not found]",
+    "expected_sources": []
+  },
+  {
+    "id": "Q4",
+    "question": "Within what exact temperature range, in degrees Celsius, must reconstituted CardioVex vials be stored before administration?",
+    "answer": "Strictly between 2 degrees Celsius and 8 degrees Celsius (2 C to 8 C).",
+    "sources": [
+      "Page 42"
+    ],
+    "expected_answer": "2\u00b0C to 8\u00b0C",
+    "expected_sources": [
+      "Page 42"
+    ]
+  },
+  {
+    "id": "Q5",
+    "question": "What is the standard recommended dosage of amoxicillin for treating a paediatric ear infection?",
+    "answer": "[not found]",
+    "sources": [],
+    "expected_answer": "[not found]",
+    "expected_sources": []
+  }
+]

@@ -1,0 +1,10 @@
+.env
+__pycache__/
+*.pyc
+.venv/
+venv/
+.DS_Store
+
+# Explicitly track ChromaDB directory for submission
+!chroma_db/
+!chroma_db/**
