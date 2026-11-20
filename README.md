@@ -80,10 +80,10 @@ The system was evaluated against 5 assessment questions spanning protocol inclus
 
 | ID | Assessment Question | Expected Answer | Expected Sources | Actual Generated Answer | Actual Sources | Status |
 |:---|:---|:---|:---|:---|:---|:---:|
-| **Q1** | What is the minimum required estimated Glomerular Filtration Rate (eGFR) threshold for a patient to be included in the CardioVex Phase III trial? | at least 45 mL/min/1.73m2 | `["Page 14"]` | The minimum required baseline estimated Glomerular Filtration Rate (eGFR) is at least 45 mL/min/1.73m2 (calculated using the CKD-EPI creatinine equation). | `["Page 14"]` | ✅ MATCH |
-| **Q2** | Within how many hours of becoming aware of a Serious Adverse Event (SAE) must a site investigator report it to the pharmacovigilance safety desk? | within 24 hours | `["Page 28"]` | Within 24 hours of initial site awareness. | `["Page 28"]` | ✅ MATCH |
+| **Q1** | What is the minimum required estimated Glomerular Filtration Rate (eGFR) threshold for a patient to be included in the CardioVex Phase III trial? | at least 45 mL/min/1.73m2 | `["Page 14"]` | The minimum required baseline estimated Glomerular Filtration Rate (eGFR) is 45 mL/min/1.73m2. | `["Page 14"]` | ✅ MATCH |
+| **Q2** | Within how many hours of becoming aware of a Serious Adverse Event (SAE) must a site investigator report it to the pharmacovigilance safety desk? | within 24 hours | `["Page 28"]` | Principal Investigators and site clinical coordinators must report any Serious Adverse Event (SAE) to the central Pharmacovigilance Safety Desk within 24 hours of initial site awareness. | `["Page 28"]` | ✅ MATCH |
 | **Q3** | What is the wholesale or retail price of CardioVex in commercial pharmacies? | `[not found]` | `[]` | `[not found]` | `[]` | ✅ MATCH |
-| **Q4** | Within what exact temperature range, in degrees Celsius, must reconstituted CardioVex vials be stored before administration? | 2°C to 8°C | `["Page 42"]` | Strictly between 2 degrees Celsius and 8 degrees Celsius (2 C to 8 C). | `["Page 42"]` | ✅ MATCH |
+| **Q4** | Within what exact temperature range, in degrees Celsius, must reconstituted CardioVex vials be stored before administration? | 2°C to 8°C | `["Page 42"]` | Reconstituted CardioVex vials must be stored strictly between 2 degrees Celsius and 8 degrees Celsius (2 C to 8 C). | `["Page 42"]` | ✅ MATCH |
 | **Q5** | What is the standard recommended dosage of amoxicillin for treating a paediatric ear infection? | `[not found]` | `[]` | `[not found]` | `[]` | ✅ MATCH |
 
 ---

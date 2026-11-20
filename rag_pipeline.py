@@ -201,24 +201,24 @@ Answer: <concise grounded answer>
 Sources: <comma-separated page labels, e.g. Page 14>
 """
 
-    response = None
-    candidate_models = [LLM_MODEL, "gemini-3.8-flash", "gemini-2.0-flash"]
-    for model_name in candidate_models:
-        try:
-            response = client.models.generate_content(
-                model=model_name,
-                contents=user_prompt,
-                config=types.GenerateContentConfig(
-                    system_instruction=SYSTEM_PROMPT,
-                    temperature=0.0,
-                ),
-            )
-            if response:
-                break
-        except Exception as e:
-            if model_name == candidate_models[-1]:
-                raise e
-            continue
+    try:
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=user_prompt,
+            config=types.GenerateContentConfig(
+                system_instruction=SYSTEM_PROMPT,
+                temperature=0.0,
+            ),
+        )
+    except Exception:
+        response = client.models.generate_content(
+            model="gemini-3.1-flash-lite",
+            contents=user_prompt,
+            config=types.GenerateContentConfig(
+                system_instruction=SYSTEM_PROMPT,
+                temperature=0.0,
+            ),
+        )
 
     raw_text = response.text.strip() if response.text else ""
 

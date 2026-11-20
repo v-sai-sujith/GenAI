@@ -2,7 +2,7 @@
   {
     "id": "Q1",
     "question": "What is the minimum required estimated Glomerular Filtration Rate (eGFR) threshold for a patient to be included in the CardioVex Phase III trial?",
-    "answer": "The minimum required baseline estimated Glomerular Filtration Rate (eGFR) is at least 45 mL/min/1.73m2 (calculated using the CKD-EPI creatinine equation).",
+    "answer": "The minimum required baseline estimated Glomerular Filtration Rate (eGFR) is 45 mL/min/1.73m2.",
     "sources": [
       "Page 14"
     ],
@@ -14,7 +14,7 @@
   {
     "id": "Q2",
     "question": "Within how many hours of becoming aware of a Serious Adverse Event (SAE) must a site investigator report it to the pharmacovigilance safety desk?",
-    "answer": "Within 24 hours of initial site awareness.",
+    "answer": "Principal Investigators and site clinical coordinators must report any Serious Adverse Event (SAE) to the central Pharmacovigilance Safety Desk within 24 hours of initial site awareness.",
     "sources": [
       "Page 28"
     ],
@@ -34,7 +34,7 @@
   {
     "id": "Q4",
     "question": "Within what exact temperature range, in degrees Celsius, must reconstituted CardioVex vials be stored before administration?",
-    "answer": "Strictly between 2 degrees Celsius and 8 degrees Celsius (2 C to 8 C).",
+    "answer": "Reconstituted CardioVex vials must be stored strictly between 2 degrees Celsius and 8 degrees Celsius (2 C to 8 C).",
     "sources": [
       "Page 42"
     ],
