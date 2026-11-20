@@ -54,9 +54,9 @@ st.markdown(
     .source-badge {
         display: inline-flex;
         align-items: center;
-        background-color: #eff6ff;
-        color: #1e40af;
-        border: 1px solid #bfdbfe;
+        background-color: #ebf5fa;
+        color: #0077b6;
+        border: 1px solid #bee1f5;
         padding: 0.25rem 0.65rem;
         border-radius: 6px;
         font-weight: 600;
@@ -65,14 +65,18 @@ st.markdown(
         margin-top: 0.5rem;
     }
     .header-title {
-        font-size: 2rem;
+        font-size: 2.1rem;
         font-weight: 800;
-        color: #0f172a;
+        color: #0f2942;
         letter-spacing: -0.025em;
         margin-bottom: 0.2rem;
     }
     .header-subtitle {
-        font-size: 1rem;
+        font-size: 1.05rem;
+        color: #0077b6;
+        font-weight: 500;
+        margin-bottom: 1.5rem;
+    }
         color: #64748b;
         margin-bottom: 1.5rem;
     }
